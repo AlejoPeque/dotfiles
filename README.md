@@ -8,6 +8,7 @@ My Neovim and Tmux setup, using NvChad.
 - Alacritty + Themes
 - Transparent Neovim
 - Tmux configuration
+- Theme for zsh - (Rename the folder to '.oh-my-zsh')
 
 #### Links
 
