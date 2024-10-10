@@ -1,16 +1,17 @@
-# dotfiles
+# ⊙ dotfiles
 
-My Neovim and Tmux setup, using NvChad.
+My Neovim configuration and other dotfiles (Tmux, Alacritty, Kitty, Zsh)
 
-### Include
+## Include
 
-- NvChad
-- Alacritty + Themes
-- Transparent Neovim
-- Tmux configuration
-- Theme for zsh - (Rename the folder to '.oh-my-zsh')
+- Neovim 🗿
+- Alacritty + Themes 💻
+- Kitty + Themes 🐱
+- Transparent Neovim 🌌
+- Tmux configuration 📦
+- Theme for zsh - ohMyPosh - (Rename the folder to '.oh-my-zsh') 🐚
 
-#### Links
+## Links
 
 [NvChad](https://nvchad.com/)
 [Tmux](https://github.com/tmux/tmux/wiki)

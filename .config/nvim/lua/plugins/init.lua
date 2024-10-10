@@ -4,13 +4,13 @@ local default_plugins = {
 
   "nvim-lua/plenary.nvim",
 
-  {
-    "NvChad/base46",
-    branch = "v2.0",
-    build = function()
-      require("base46").load_all_highlights()
-    end,
-  },
+  -- {
+  --   "NvChad/base46",
+  --   branch = "v2.0",
+  --   build = function()
+  --     require("base46").load_all_highlights()
+  --   end,
+  -- },
 
   {
     "NvChad/ui",
@@ -24,7 +24,7 @@ local default_plugins = {
       require("core.utils").load_mappings "nvterm"
     end,
     config = function(_, opts)
-      require "base46.term"
+      -- require "base46.term"
       require("nvterm").setup(opts)
     end,
   },
@@ -48,35 +48,21 @@ local default_plugins = {
       return { override = require "nvchad.icons.devicons" }
     end,
     config = function(_, opts)
-      dofile(vim.g.base46_cache .. "devicons")
+      -- dofile(vim.g.base46_cache .. "devicons")
       require("nvim-web-devicons").setup(opts)
     end,
   },
 
   {
-    "lukas-reineke/indent-blankline.nvim",
-    version = "2.20.7",
-    event = "User FilePost",
-    opts = function()
-      return require("plugins.configs.others").blankline
-    end,
-    config = function(_, opts)
-      require("core.utils").load_mappings "blankline"
-      dofile(vim.g.base46_cache .. "blankline")
-      require("indent_blankline").setup(opts)
-    end,
-  },
-
-  {
     "nvim-treesitter/nvim-treesitter",
-    event = { "BufReadPost", "BufNewFile" },
+    event = { "BufReadPost", "BufNewFile", "VimEnter", "BufWinEnter", "InsertEnter" },
     cmd = { "TSInstall", "TSBufEnable", "TSBufDisable", "TSModuleInfo" },
     build = ":TSUpdate",
     opts = function()
       return require "plugins.configs.treesitter"
     end,
     config = function(_, opts)
-      dofile(vim.g.base46_cache .. "syntax")
+      -- dofile(vim.g.base46_cache .. "syntax")
       require("nvim-treesitter.configs").setup(opts)
     end,
   },
@@ -89,7 +75,7 @@ local default_plugins = {
       return require("plugins.configs.others").gitsigns
     end,
     config = function(_, opts)
-      dofile(vim.g.base46_cache .. "git")
+      -- dofile(vim.g.base46_cache .. "git")
       require("gitsigns").setup(opts)
     end,
   },
@@ -102,7 +88,7 @@ local default_plugins = {
       return require "plugins.configs.mason"
     end,
     config = function(_, opts)
-      dofile(vim.g.base46_cache .. "mason")
+      -- dofile(vim.g.base46_cache .. "mason")
       require("mason").setup(opts)
 
       -- custom nvchad cmd to install all mason binaries listed
@@ -201,7 +187,7 @@ local default_plugins = {
       return require "plugins.configs.nvimtree"
     end,
     config = function(_, opts)
-      dofile(vim.g.base46_cache .. "nvimtree")
+      -- dofile(vim.g.base46_cache .. "nvimtree")
       require("nvim-tree").setup(opts)
     end,
   },
@@ -217,7 +203,7 @@ local default_plugins = {
       return require "plugins.configs.telescope"
     end,
     config = function(_, opts)
-      dofile(vim.g.base46_cache .. "telescope")
+      -- dofile(vim.g.base46_cache .. "telescope")
       local telescope = require "telescope"
       telescope.setup(opts)
 
@@ -237,68 +223,40 @@ local default_plugins = {
     end,
     cmd = "WhichKey",
     config = function(_, opts)
-      dofile(vim.g.base46_cache .. "whichkey")
+      -- dofile(vim.g.base46_cache .. "whichkey")
       require("which-key").setup(opts)
     end,
   },
-  -- Ident
+  -- Markdown Preview
   {
-    "shellRaining/hlchunk.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    config = function()
-      require("hlchunk").setup({
-        chunk = {
-          enable = true,
-          use_treesitter = true,
-          chars = {
-            horizontal_line = "─",
-            vertical_line = "│",
-            left_top = "┌",
-            left_bottom = "└",
-            right_arrow = "─",
-          },
-          style = "#737aa2",
-        },
-        indent = {
-          enable = true,
-          use_treesitter = true,
-          chars = {
-            "│",
-            "¦",
-            "┆",
-            "┊",
-          },
-          style = {
-            vim.fn.synIDattr(vim.fn.synIDtrans(vim.fn.hlID("Whitespace")), "fg", "gui"),
-          },
-        },
-      })
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    ft = { "markdown" },
+    build = function()
+      vim.fn["mkdp#util#install"]()
     end,
   },
-  -- Smooth Cursor
-  {
-    "gen740/SmoothCursor.nvim",
-    event = "BufWinEnter",
-    config = function()
-      require("smoothcursor").setup({
-        type = "default",
-        fancy = {
-          enable = true, -- enable fancy mode
-          head = { cursor = "▷", texthl = "SmoothCursor", linehl = nil }, -- false to disable fancy head
-          body = {
-            { cursor = "󰝥", texthl = "SmoothCursorRed" },
-            { cursor = "󰝥", texthl = "SmoothCursorOrange" },
-            { cursor = "●", texthl = "SmoothCursorYellow" },
-            { cursor = "●", texthl = "SmoothCursorGreen" },
-            { cursor = "•", texthl = "SmoothCursorAqua" },
-            { cursor = ".", texthl = "SmoothCursorBlue" },
-            { cursor = ".", texthl = "SmoothCursorPurple" },
-          },
-          tail = { cursor = nil, texthl = "SmoothCursor" }, -- false to disable fancy tail
-        },
-      })
-    end,
-  },
+
+  -- THEMES
+  require("themes.catppuccin"),
+  require("themes.github-nvim"),
+  require("themes.gruvbox"),
+  require("themes.kanagawa"),
+  require("themes.nordic"),
+  require("themes.onedark"),
+  require("themes.rose-pine"),
+  require("themes.tokyodark"),
+  require("themes.tokyonight"),
+  require("themes.bamboo"), -- BUENO
+  require("themes.solarized-osaka"),
+  require("themes.poimandres"),
+  require("themes.oldworld"), -- BUENO
+  require("themes.oh-lucy"), -- BUENO
+  require("themes.minimal"),
+  require("themes.mellow"),
+  require("themes.obscure"),
+  require("themes.aquarium")
+
 }
 
 local config = require("core.utils").load_config()

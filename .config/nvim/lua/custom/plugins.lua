@@ -6,9 +6,24 @@ local plugins = {
       return require "custom.configs.null-ls"
     end,
   },
+  { "mattn/emmet-vim" },
   {
     "jose-elias-alvarez/null-ls.nvim",
-    ft = "go",
+    ft = {
+      "javascript",
+      "typescript",
+      "typescriptreact",
+      "javascriptreact",
+      "css",
+      "scss",
+      "html",
+      "json",
+      "lua",
+      "python",
+      "go",
+      "rust",
+      "java",
+    },
     opts = function ()
       return require "custom.configs.null-ls"
     end
@@ -28,6 +43,39 @@ local plugins = {
     end
   },
   {
+    "rcarriga/nvim-dap-ui",
+    event = "VeryLazy",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+      "nvim-neotest/nvim-nio",
+    },
+    config = function ()
+      local dap = require('dap')
+      local dapui = require('dapui')
+      dapui.setup()
+      dap.listeners.after.event_initialized['dapui_config'] = function ()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated['dapui_config'] = function ()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited['dapui_config'] = function ()
+        dapui.close()
+      end
+    end
+  },
+  {
+    "jay-babu/mason-nvim-dap.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "mfussenegger/nvim-dap",
+      "williamboman/mason.nvim",
+    },
+    opts = {
+      handlers = {},
+    }
+  },
+  {
     "williamboman/mason.nvim",
     opts = {
       ensure_installed = {
@@ -41,8 +89,22 @@ local plugins = {
         "ruff",
         "pyright",
         "rust-analyzer",
+        "clangd",
+        -- "clangd-format",
+        "codelldb",
+        "css-lsp",
+        "html-lsp",
       }
     }
+  },
+  {
+    "mfussenegger/nvim-dap",
+    config = function (_, _)
+      require("core.utils").load_mappings("dap")
+    end
+  },
+  {
+    "nvim-neotest/nvim-nio",
   },
   {
     "simrat39/rust-tools.nvim",
@@ -72,121 +134,126 @@ local plugins = {
   },
   {
     "nvim-treesitter/nvim-treesitter",
+    event = { "BufReadPost", "BufNewFile", "VimEnter", "BufWinEnter", "InsertEnter" },
     opts = function()
-      opts = require "plugins.configs.treesitter"
+      local opts = require "plugins.configs.treesitter"
       opts.ensure_installed = {
         "lua",
         "javascript",
         "typescript",
         "tsx",
         "css",
+        "java",
+        "python",
+        "go",
+        "rust",
+        "json",
       }
       return opts
     end
   },
-  -- Lines that were added, modified or deleted on git
   {
-    "lewis6991/gitsigns.nvim",
-  event = { "BufReadPre", "BufNewFile" },
-  opts = {
-    on_attach = function(bufnr)
-      local gs = package.loaded.gitsigns
-
-      local function map(mode, l, r, desc)
-        vim.keymap.set(mode, l, r, { buffer = bufnr, desc = desc })
-      end
-
-      -- Navigation
-      map("n", "]h", gs.next_hunk, "Next Hunk")
-      map("n", "[h", gs.prev_hunk, "Prev Hunk")
-
-      -- Actions
-      map("n", "<leader>hs", gs.stage_hunk, "Stage hunk")
-      map("n", "<leader>hr", gs.reset_hunk, "Reset hunk")
-      map("v", "<leader>hs", function()
-        gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-      end, "Stage hunk")
-      map("v", "<leader>hr", function()
-        gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-      end, "Reset hunk")
-
-      map("n", "<leader>hS", gs.stage_buffer, "Stage buffer")
-      map("n", "<leader>hR", gs.reset_buffer, "Reset buffer")
-
-      map("n", "<leader>hu", gs.undo_stage_hunk, "Undo stage hunk")
-
-      map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")
-
-      map("n", "<leader>hb", function()
-        gs.blame_line({ full = true })
-      end, "Blame line")
-      map("n", "<leader>hB", gs.toggle_current_line_blame, "Toggle line blame")
-
-      map("n", "<leader>hd", gs.diffthis, "Diff this")
-      map("n", "<leader>hD", function()
-        gs.diffthis("~")
-      end, "Diff this ~")
-
-      -- Text object
-      map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "Gitsigns select hunk")
+    'nvim-treesitter/nvim-treesitter-textobjects'
+  },
+  {
+    "github/copilot.vim",
+    event = "VeryLazy",
+    config = function()
+      vim.g.copilot_filetypes = {
+        ["TelescopePrompt"] = false,
+        ["grug-far"] = false,
+        ["grug-far-history"] = false,
+      }
+      vim.g.copilot_assume_mapped = true
+      vim.g.copilot_workspace_folders = "~/Projects"
+      local keymap = vim.keymap.set
+      local opts = { silent = true }
+      keymap("i", "<C-y>", 'copilot#Accept("\\<CR>")', { expr = true, replace_keycodes = false })
+      keymap("i", "<C-i>", "<Plug>(copilot-accept-line)", opts)
+      keymap("i", "<C-j>", "<Plug>(copilot-next)", opts)
+      keymap("i", "<C-k>", "<Plug>(copilot-previous)", opts)
+      keymap("i", "<C-d>", "<Plug>(copilot-dismiss)", opts)
     end,
   },
+  { "mfussenegger/nvim-jdtls", event = "BufRead" },
+  -- {
+  --   "lukas-reineke/indent-blankline.nvim",
+  --   event = { "BufReadPre", "BufNewFile" },
+  --   config = function()
+  --     require("indent_blankline").setup({
+  --       char = "┊",
+  --       buftype_exclude = { "terminal" },
+  --       filetype_exclude = { "help", "packer" },
+  --       show_trailing_blankline_indent = false,
+  --       show_first_indent_level = true,
+  --       use_treesitter = true,
+  --       show_current_context = true,
+  --     })
+  --   end,
+  -- },
+
+  {
+    "rcarriga/nvim-notify",
+    config = function()
+      require("notify").setup({
+        background_colour = "#5489b8",  -- Ajusta el color de fondo aquí
+        stages = "slide",    -- Estilo de animación para las notificaciones
+        timeout = 5000,                  -- Duración antes de que las notificaciones desaparezcan (en milisegundos)
+        max_width = 80,                  -- Ancho máximo de los mensajes de notificación
+        min_width = 50,                  -- Ancho mínimo de los mensajes de notificación
+        max_height = 10,                 -- Número máximo de líneas para un mensaje
+        level = vim.log.levels.INFO,     -- Nivel mínimo de registro para mostrar notificaciones
+        top_down = true,                 -- Posicionar las notificaciones de arriba hacia abajo
+      })
+
+      -- Establecer 'notify' como el sistema de notificaciones predeterminado
+      vim.notify = require("notify")
+    end,
   },
   {
-"nvim-tree/nvim-tree.lua",
-  dependencies = "nvim-tree/nvim-web-devicons",
-  config = function()
-    local nvimtree = require("nvim-tree")
-
-    -- recommended settings from nvim-tree documentation
-    vim.g.loaded_netrw = 1
-    vim.g.loaded_netrwPlugin = 1
-
-    nvimtree.setup({
-      view = {
-        width = 35,
-        relativenumber = true,
-      },
-      -- change folder arrow icons
-      renderer = {
-        indent_markers = {
-          enable = true,
-        },
-        icons = {
-          glyphs = {
-            folder = {
-              arrow_closed = "", -- arrow when folder is closed
-              arrow_open = "", -- arrow when folder is open
-            },
+    "folke/noice.nvim",
+    event = "VimEnter",
+    config = function()
+      require("noice").setup({
+        cmdline = {
+          enabled = true, -- habilita la UI personalizada para cmdline
+          format = {
+            cmdline = { pattern = "^:", icon = "", lang = "vim" },
+            search_down = { kind = "search", pattern = "^/", icon = " ", lang = "regex" },
+            search_up = { kind = "search", pattern = "^%?", icon = " ", lang = "regex" },
           },
         },
-      },
-      -- disable window_picker for
-      -- explorer to work well with
-      -- window splits
-      actions = {
-        open_file = {
-          window_picker = {
-            enable = false,
+        popupmenu = {
+          enabled = true, -- habilita el popupmenu en cmdline
+        },
+        messages = {
+          enabled = true, -- habilita los mensajes estilizados
+        },
+        notify = {
+          enabled = true, -- usa `nvim-notify` si está instalado
+        },
+        lsp = {
+          hover = {
+            enabled = false, -- deshabilita el hover de LSP en Noice
+          },
+          signature = {
+            enabled = false, -- puedes mantener habilitada la firma si lo deseas
           },
         },
-      },
-      filters = {
-        custom = { ".DS_Store" },
-      },
-      git = {
-        ignore = false,
-      },
-    })
-
-    -- set keymaps
-    local keymap = vim.keymap -- for conciseness
-
-    keymap.set("n", "<leader>ee", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" }) -- toggle file explorer
-    keymap.set("n", "<leader>ef", "<cmd>NvimTreeFindFileToggle<CR>", { desc = "Toggle file explorer on current file" }) -- toggle file explorer on current file
-    keymap.set("n", "<leader>ec", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse file explorer" }) -- collapse file explorer
-    keymap.set("n", "<leader>er", "<cmd>NvimTreeRefresh<CR>", { desc = "Refresh file explorer" }) -- refresh file explorer
-  end
+      })
+    end,
+    dependencies = {
+      "MunifTanjim/nui.nvim", -- Dependencia requerida para Noice UI
+      "rcarriga/nvim-notify", -- Opcional para mejores notificaciones
+    }
   },
+  {
+    "CRAG666/code_runner.nvim",
+    requires = "nvim-lua/plenary.nvim",
+  },
+  {
+    "jupyter-vim/jupyter-vim",
+    requires = { 'nvim-lua/plenary.nvim' }
+  }
 }
 return plugins

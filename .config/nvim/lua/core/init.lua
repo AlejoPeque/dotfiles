@@ -102,7 +102,8 @@ autocmd("BufWritePost", {
       vim.opt.tabline = "%!v:lua.require('nvchad.tabufline.modules').run()"
     end
 
-    require("base46").load_all_highlights()
+    -- THEMES BASE46
+    -- require("base46").load_all_highlights()
     -- vim.cmd("redraw!")
   end,
 })

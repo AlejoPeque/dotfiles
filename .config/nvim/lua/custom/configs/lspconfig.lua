@@ -5,7 +5,50 @@ local capabilities = base.capabilities
 local lspconfig = require("lspconfig")
 local util = require "lspconfig/util"
 
-local servers = { "tsserver", "tailwindcss", "eslint", "gopls", "pyright" }
+local servers = {
+  "ts_ls",
+  "tailwindcss",
+  "eslint",
+  "gopls",
+  "pyright",
+  "jdtls",
+  "cssls",  -- Asegúrate de que esté en la lista de servidores
+}
+
+lspconfig.pyright.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  filetypes = { "python" },
+})
+
+lspconfig.clangd.setup {
+  on_attach = function (client, bufnr)
+    client.server_capabilities.document_formatting = false
+    on_attach(client, bufnr)
+  end,
+  capabilities = capabilities,
+}
+
+-- Aquí puedes agregar la configuración específica para cssls
+lspconfig.cssls.setup({
+  on_attach = on_attach,
+  capabilities = capabilities,
+  filetypes = { "css", "scss", "less", "sass" },  -- Soporte para los tipos de archivo
+  settings = {
+    css = {
+      validate = true,
+    },
+    scss = {
+      validate = true,
+    },
+    less = {
+      validate = true,
+    },
+    sass = {
+      validate = true,
+    },
+  },
+})
 
 local function setup_server(server, config)
   lspconfig[server].setup(config)

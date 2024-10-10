@@ -1,7 +1,10 @@
 local options = {
   filters = {
-    dotfiles = false,
-    exclude = { vim.fn.stdpath "config" .. "/lua/custom" },
+    dotfiles = false, -- Ocultar dotfiles en general
+    exclude = {
+      vim.fn.stdpath("config") .. "/lua/custom",
+      ".env" -- Excepción para mostrar archivos .env
+    },
   },
   disable_netrw = true,
   hijack_netrw = true,
@@ -13,13 +16,14 @@ local options = {
     update_root = false,
   },
   view = {
-    adaptive_size = false,
+    adaptive_size = true,
     side = "left",
-    width = 30,
+    width = 60,
     preserve_window_proportions = true,
+    relativenumber = false,
   },
   git = {
-    enable = false,
+    enable = true,
     ignore = true,
   },
   filesystem_watchers = {
@@ -32,7 +36,7 @@ local options = {
   },
   renderer = {
     root_folder_label = false,
-    highlight_git = false,
+    highlight_git = true,
     highlight_opened_files = "none",
 
     indent_markers = {
@@ -44,7 +48,7 @@ local options = {
         file = true,
         folder = true,
         folder_arrow = true,
-        git = false,
+        git = true,
       },
 
       glyphs = {
@@ -61,7 +65,7 @@ local options = {
           arrow_closed = "",
         },
         git = {
-          unstaged = "✗",
+          unstaged = "✚",
           staged = "✓",
           unmerged = "",
           renamed = "➜",
