@@ -29,11 +29,26 @@ local plugins = {
     end
   },
   {
+    "terryma/vim-multiple-cursors",
+  },
+  {
     "vim-crystal/vim-crystal",
     ft = "crystal",
     config = function(_)
       vim.g.crystal_auto_format = 1
     end
+  },
+  {
+    "chrisgrieser/nvim-rip-substitute",
+    cmd = "RipSubstitute",
+    keys = {
+      {
+        "<leader>fs",
+        function() require("rip-substitute").sub() end,
+        mode = { "n", "x" },
+        desc = " rip substitute",
+      },
+    },
   },
   {
     "neovim/nvim-lspconfig",
@@ -176,21 +191,35 @@ local plugins = {
     end,
   },
   { "mfussenegger/nvim-jdtls", event = "BufRead" },
-  -- {
-  --   "lukas-reineke/indent-blankline.nvim",
-  --   event = { "BufReadPre", "BufNewFile" },
-  --   config = function()
-  --     require("indent_blankline").setup({
-  --       char = "┊",
-  --       buftype_exclude = { "terminal" },
-  --       filetype_exclude = { "help", "packer" },
-  --       show_trailing_blankline_indent = false,
-  --       show_first_indent_level = true,
-  --       use_treesitter = true,
-  --       show_current_context = true,
-  --     })
-  --   end,
-  -- },
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      local hooks = require "ibl.hooks"
+      -- Crear el grupo de resaltado en el hook de configuración de resaltado
+      hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
+          vim.api.nvim_set_hl(0, "IndentBlanklineContextChar", { fg = "#FFFFFF", nocombine = true })
+      end)
+
+      require("ibl").setup({
+        indent = {
+          char = "|",
+        },
+        exclude = {
+          buftypes = { "terminal" },
+          filetypes = { "help", "packer" },
+        },
+        scope = {
+          enabled = true,
+          show_start = false,
+          show_end = false,
+          highlight = { "IndentBlanklineContextChar" },
+        },
+      })
+
+      hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
+    end,
+  },
 
   {
     "rcarriga/nvim-notify",
